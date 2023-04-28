@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Book_Bazaar_.Models
+namespace Book_Bazaar_.Models.Auth
 {
-    public class Users
+    public class RegisterModel
     {
-        public int UserID { get; set; }
         [Required(ErrorMessage = "First Name is required")]
         public string FirstName { get; set; } = string.Empty;
         [Required(ErrorMessage = "Last Name is required")]

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Book_Bazaar_.Models
+namespace Book_Bazaar_.Models.Auth
 {
     public class LoginModel
     {
