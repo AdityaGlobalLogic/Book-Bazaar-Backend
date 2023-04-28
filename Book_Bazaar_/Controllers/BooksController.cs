@@ -1,6 +1,8 @@
-﻿using Book_Bazaar_.Models.Tables;
+﻿using Book_Bazaar_.Models.Auth;
+using Book_Bazaar_.Models.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
 namespace Book_Bazaar_.Controllers
@@ -18,7 +20,7 @@ namespace Book_Bazaar_.Controllers
 
         [HttpGet]
         [Route("api/books")]
-        public async  Task<ActionResult> GetBooks()
+        public async Task<ActionResult> GetBooks()
         {
             List<Books> books = new List<Books>();
 
@@ -44,17 +46,19 @@ namespace Book_Bazaar_.Controllers
                                 ISBN = (int)reader["ISBN"],
                                 BookImage = (string)reader["BookImage"],
                                 UserID = (int)reader["UserID"],
-                                CategoryID = (int)reader["CategoryID"]
                             };
 
                             books.Add(book);
                         }
                     }
                 }
+                connection.Close();
             }
 
             return Ok(books);
         }
+
+
     }
 }
-}
+

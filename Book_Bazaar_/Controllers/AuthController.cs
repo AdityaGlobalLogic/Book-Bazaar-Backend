@@ -1,5 +1,6 @@
-﻿using Book_Bazaar_.Models;
+
 using Book_Bazaar_.Models.Auth;
+using Book_Bazaar_.Models.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
@@ -40,12 +41,13 @@ namespace Book_Bazaar_.Controllers
                     command.Parameters.AddWithValue("@FirstName", user.FirstName);
                     command.Parameters.AddWithValue("@LastName", user.LastName);
                     command.Parameters.AddWithValue("@Password", user.Password);
-                    command.Parameters.AddWithValue("@Email", user.Email);         
+                    command.Parameters.AddWithValue("@Email", user.Email);
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
             }
-            return Ok( new {
+            return Ok(new
+            {
                 message = "User registered successfully"
             });
         }
@@ -62,7 +64,7 @@ namespace Book_Bazaar_.Controllers
                 {
                     command.Parameters.AddWithValue("@Email", loginModel.Email);
                     command.Parameters.AddWithValue("@Password", loginModel.Password);
-                    using(SqlDataReader reader = command.ExecuteReader())
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
                         if (!reader.Read())
                         {
@@ -77,11 +79,15 @@ namespace Book_Bazaar_.Controllers
                             FirstName = (string)reader["FirstName"],
                             LastName = (string)reader["LastName"]
                         };
-                        return Ok( authticatedUser ); 
-                    }    
+                        return Ok(new
+                        {
+                            message = "Logged In Successfull",
+                            authticatedUser
+                        });
+                    }
+                    connection.Close();
                 }
-                connection.Close();
-            }     
+            }
         }
     }
 }
