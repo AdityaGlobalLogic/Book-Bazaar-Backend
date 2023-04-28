@@ -1,4 +1,5 @@
 ﻿using Book_Bazaar_.Models;
+using Book_Bazaar_.Models.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
