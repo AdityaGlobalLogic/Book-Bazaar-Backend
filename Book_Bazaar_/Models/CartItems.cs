@@ -1,8 +1,8 @@
 ﻿namespace Book_Bazaar_.Models
 {
-    public class Cart
+    public class CartItems
     {
         public int CartID { get; set; }
-        public int UserID { get; set; }
+        public int BookID { get; set;}
     }
 }
