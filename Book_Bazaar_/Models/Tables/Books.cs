@@ -11,6 +11,6 @@
         public int ISBN { get; set; }
         public string BookImage { get; set; }
         public int UserID { get; set; }
-        public int CategoryID { get; set; }
+        public int? CategoryID { get; set; }
     }
 }
