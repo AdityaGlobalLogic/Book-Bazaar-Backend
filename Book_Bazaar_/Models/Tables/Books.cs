@@ -1,4 +1,6 @@
-﻿namespace Book_Bazaar_.Models.Tables
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Book_Bazaar_.Models.Tables
 {
     public class Books
     {
@@ -12,5 +14,7 @@
         public string BookImage { get; set; }
         public int UserID { get; set; }
         public int? CategoryID { get; set; }
+        [Range(0,5,ErrorMessage = "Enter value greater than 0 and less than 5")]
+        public decimal Rating { get; set; }
     }
 }

@@ -46,6 +46,7 @@ namespace Book_Bazaar_.Controllers
                                 ISBN = (int)reader["ISBN"],
                                 BookImage = (string)reader["BookImage"],
                                 UserID = (int)reader["UserID"],
+                                Rating = (decimal)reader["Rating"],
                             };
 
                             books.Add(book);
