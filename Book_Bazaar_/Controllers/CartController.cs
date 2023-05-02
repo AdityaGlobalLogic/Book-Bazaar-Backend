@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 
+
 namespace Book_Bazaar_.Controllers
 {
     [Route("api/[controller]")]
@@ -159,7 +160,6 @@ namespace Book_Bazaar_.Controllers
                 }
             }
         }
-
         [HttpGet]
         [Route("api/cart/{userId}")]
         public async Task<ActionResult> GetCart(int userId)
@@ -188,7 +188,7 @@ namespace Book_Bazaar_.Controllers
                                 ISBN = (int)reader["ISBN"],
                                 BookImage = (string)reader["BookImage"],
                                 UserID = (int)reader["UserID"],
-                                /*Rating = (decimal)reader["Rating"],*/
+                                // Rating = (decimal)reader["Rating"],//
                             };
                             books.Add(book);
                         }
