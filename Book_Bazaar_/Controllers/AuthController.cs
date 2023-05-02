@@ -73,7 +73,7 @@ namespace Book_Bazaar_.Controllers
 
                         Users authticatedUser = new Users
                         {
-                            UserID = (int)reader["UserID"],
+                            UserID = (Guid)reader["UserID"],
                             Email = (string)reader["Email"],
                             IsVendor = (bool)reader["IsVendor"],
                             FirstName = (string)reader["FirstName"],

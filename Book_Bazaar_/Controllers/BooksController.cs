@@ -37,7 +37,7 @@ namespace Book_Bazaar_.Controllers
                         {
                             Books book = new Books
                             {
-                                BookID = (int)reader["BookID"],
+                                BookID = (Guid)reader["BookID"],
                                 Title = (string)reader["Title"],
                                 Description = (string)reader["Description"],
                                 AuthorName = (string)reader["AuthorName"],
@@ -45,7 +45,8 @@ namespace Book_Bazaar_.Controllers
                                 Quantity= (int)reader["Quantity"],
                                 ISBN = (int)reader["ISBN"],
                                 BookImage = (string)reader["BookImage"],
-                                UserID = (int)reader["UserID"],
+                                UserID = (Guid)reader["UserID"],
+                                CategoryID = (Guid)reader["CategoryID"],
                                 Rating = (decimal)reader["Rating"],
                             };
 
@@ -59,7 +60,46 @@ namespace Book_Bazaar_.Controllers
             return Ok(books);
         }
 
+        [HttpGet]
+        [Route("api/books/{CategoryID}")]
+        public async Task<ActionResult> FilterBooksByCategory(Guid CategoryID)
+        {
+            List<Books> books = new List<Books>();
 
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                connection.Open();
+
+                // Retrieve list of books from database
+                using (SqlCommand command = new SqlCommand("SELECT * FROM Books where CategoryID = @CategoryID", connection))
+                {
+                    command.Parameters.AddWithValue("@CategoryID", CategoryID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Books book = new Books
+                            {
+                                BookID = (Guid)reader["BookID"],
+                                Title = (string)reader["Title"],
+                                Description = (string)reader["Description"],
+                                AuthorName = (string)reader["AuthorName"],
+                                Price = (decimal)reader["Price"],
+                                Quantity = (int)reader["Quantity"],
+                                ISBN = (int)reader["ISBN"],
+                                BookImage = (string)reader["BookImage"],
+                                UserID = (Guid)reader["UserID"],
+                                CategoryID = (Guid)reader["CategoryID"],
+                                Rating = (decimal)reader["Rating"],
+                            };
+                            books.Add(book);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return Ok(books);
+        }
     }
 }
 

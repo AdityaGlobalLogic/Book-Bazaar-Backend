@@ -160,9 +160,10 @@ namespace Book_Bazaar_.Controllers
                 }
             }
         }
+
         [HttpGet]
         [Route("api/cart/{userId}")]
-        public async Task<ActionResult> GetCart(int userId)
+        public async Task<ActionResult> GetCart(Guid userId)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
@@ -179,7 +180,7 @@ namespace Book_Bazaar_.Controllers
                         {
                             Books book = new Books
                             {
-                                BookID = (int)reader["BookID"],
+                                BookID = (Guid)reader["BookID"],
                                 Title = (string)reader["Title"],
                                 Description = (string)reader["Description"],
                                 AuthorName = (string)reader["AuthorName"],
@@ -187,8 +188,9 @@ namespace Book_Bazaar_.Controllers
                                 Quantity = (int)reader["Quantity"],
                                 ISBN = (int)reader["ISBN"],
                                 BookImage = (string)reader["BookImage"],
-                                UserID = (int)reader["UserID"],
-                                // Rating = (decimal)reader["Rating"],//
+                                UserID = (Guid)reader["UserID"],
+                                CategoryID = (Guid)reader["CategoryID"],
+                                Rating = (decimal)reader["Rating"]
                             };
                             books.Add(book);
                         }

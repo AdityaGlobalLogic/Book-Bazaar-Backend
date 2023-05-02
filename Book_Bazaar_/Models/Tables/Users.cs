@@ -4,7 +4,7 @@ namespace Book_Bazaar_.Models.Tables
 {
     public class Users
     {
-        public int UserID { get; set; }
+        public Guid UserID { get; set; }
         [Required(ErrorMessage = "First Name is required")]
         public string FirstName { get; set; } = string.Empty;
         [Required(ErrorMessage = "Last Name is required")]
