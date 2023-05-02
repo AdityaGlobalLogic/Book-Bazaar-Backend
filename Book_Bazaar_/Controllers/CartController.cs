@@ -1,7 +1,9 @@
 ﻿using Book_Bazaar_.Models;
+using Book_Bazaar_.Models.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+
 
 namespace Book_Bazaar_.Controllers
 {
@@ -156,6 +158,44 @@ namespace Book_Bazaar_.Controllers
                         }
                     }
                 }
+            }
+        }
+        [HttpGet]
+        [Route("api/cart/{userId}")]
+        public async Task<ActionResult> GetCart(int userId)
+        {
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                connection.Open();
+
+                // Get all books in cart for specified user
+                using (SqlCommand command = new SqlCommand("SELECT b.* FROM Cart c JOIN Books b ON c.BookID = b.BookID WHERE c.UserID = @UserID", connection))
+                {
+                    command.Parameters.AddWithValue("@UserID", userId);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        List<Books> books = new List<Books>();
+                        while (reader.Read())
+                        {
+                            Books book = new Books
+                            {
+                                BookID = (int)reader["BookID"],
+                                Title = (string)reader["Title"],
+                                Description = (string)reader["Description"],
+                                AuthorName = (string)reader["AuthorName"],
+                                Price = (decimal)reader["Price"],
+                                Quantity = (int)reader["Quantity"],
+                                ISBN = (int)reader["ISBN"],
+                                BookImage = (string)reader["BookImage"],
+                                UserID = (int)reader["UserID"],
+                                // Rating = (decimal)reader["Rating"],//
+                            };
+                            books.Add(book);
+                        }
+                        return Ok(books);
+                    }
+                }
+                connection.Close();
             }
         }
     }
