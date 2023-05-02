@@ -16,9 +16,10 @@ namespace Book_Bazaar_.Controllers
         {
             _configuration = configuration;
         }
+
         [HttpPost]
         [Route("api/users/{userId}/convert-to-vendor")]
-        public async Task<ActionResult> ConvertToVendor(int userId)
+        public async Task<ActionResult> ConvertToVendor(Guid userId)
         {
             // Connect to the database
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -48,13 +49,16 @@ namespace Book_Bazaar_.Controllers
                 // Execute the update command
                 updateCommand.ExecuteNonQuery();
 
-                return Ok();
+                return Ok(new
+                {
+                    message = "User is now Vendor"
+                });
             }
         }
 
         [HttpPost]
         [Route("api/users/{userId}/publish-book")]
-        public async Task<ActionResult> PublishBook(int userId,[FromBody] Books book)
+        public async Task<ActionResult> PublishBook(Guid userId,[FromBody] Books book)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
