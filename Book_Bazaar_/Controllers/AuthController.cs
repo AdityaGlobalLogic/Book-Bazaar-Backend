@@ -22,6 +22,7 @@ namespace Book_Bazaar_.Controllers
         [Route("api/signup")]
         public async Task<ActionResult> SignUp(RegisterModel user)
         {
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
                 connection.Open();
@@ -56,34 +57,47 @@ namespace Book_Bazaar_.Controllers
         [Route("api/login")]
         public async Task<IActionResult> Login(LoginModel loginModel)
         {
+            
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
                 connection.Open();
                 // Find user by email and password
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Users WHERE Email = @Email AND Password = @Password", connection))
+                using (SqlCommand command = new SqlCommand("SELECT * FROM Users WHERE Email = @Email", connection))
                 {
+                    
                     command.Parameters.AddWithValue("@Email", loginModel.Email);
-                    command.Parameters.AddWithValue("@Password", loginModel.Password);
+                    //command.Parameters.AddWithValue("@Password", login_pass);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        if (!reader.Read())
+                        while (reader.Read())
                         {
-                            return BadRequest("Invalid Email or Password");
-                        }
+                            string pass = (string)(reader)["Password"];
+                            bool isvalid = BCrypt.Net.BCrypt.Verify(loginModel.Password, pass);
+                            if (isvalid)
+                            {
+                                Users authticatedUser = new Users
+                                {
+                                    UserID = (Guid)reader["UserID"],
+                                    Email = (string)reader["Email"],
+                                    IsVendor = (bool)reader["IsVendor"],
+                                    FirstName = (string)reader["FirstName"],
+                                    LastName = (string)reader["LastName"]
+                                };
+                                return Ok(new
+                                {
+                                    message = "Logged In Successfull",
+                                    authticatedUser
+                                });
+                                
+                            }
+                            else
+                            {
+                                return BadRequest("Invalid Email or Password");
 
-                        Users authticatedUser = new Users
-                        {
-                            UserID = (Guid)reader["UserID"],
-                            Email = (string)reader["Email"],
-                            IsVendor = (bool)reader["IsVendor"],
-                            FirstName = (string)reader["FirstName"],
-                            LastName = (string)reader["LastName"]
-                        };
-                        return Ok(new
-                        {
-                            message = "Logged In Successfull",
-                            authticatedUser
-                        });
+                            }
+
+                        }
+                        return BadRequest("Invalid Email or Password");
                     }
                     connection.Close();
                 }
