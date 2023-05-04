@@ -1,4 +1,8 @@
-﻿using Book_Bazaar_.Models.Tables;
+﻿
+using Book_Bazaar_.Models;
+using Book_Bazaar_.Models.AWS;
+using Book_Bazaar_.Models.Tables;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +16,49 @@ namespace Book_Bazaar_.Controllers
     public class VendorController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public VendorController(IConfiguration configuration)
+        private readonly IStorageService _storageService;
+        public static IDictionary<Guid, string> url = new Dictionary<Guid, string>();
+
+        public VendorController(IConfiguration configuration, IStorageService storageService)
         {
             _configuration = configuration;
+            _storageService = storageService;
+        }
+
+        [HttpPost(Name = "UploadFile")]
+        public async Task<IActionResult> UploadFile(IFormFile file, Guid userId)
+        {
+            //Process the file
+            await using var memoryStr = new MemoryStream();
+            await file.CopyToAsync(memoryStr);
+
+            var fileExt = Path.GetExtension(file.FileName);
+            var objName = $"{Guid.NewGuid()}.{fileExt}";
+
+            var s3Obj = new S3Object()
+            {
+                BucketName = "bookbazaar",
+                InputStream = memoryStr,
+                Name = objName
+            };
+
+            var cred = new AwsCredentials()
+            {
+                AwsKey = _configuration["AwsConfiguration:AWSAccessKey"],
+                AwsSecretKey = _configuration["AwsConfiguration:AWSSecretKey"]
+            };
+
+            var result = await _storageService.UploadFileAsync(s3Obj, cred);
+
+            //get url request
+            var Imageurl = $"https://bookbazaar.s3.amazonaws.com/{objName}";
+            url.Add(userId, Imageurl);
+
+            return Ok(new 
+            { 
+                result,
+                url
+            });
         }
 
         [HttpPost]
@@ -86,7 +130,7 @@ namespace Book_Bazaar_.Controllers
                                     insertcommand.Parameters.AddWithValue("@Price", book.Price);
                                     insertcommand.Parameters.AddWithValue("@Quantity", book.Quantity);
                                     insertcommand.Parameters.AddWithValue("@ISBN", book.ISBN);
-                                    insertcommand.Parameters.AddWithValue("@BookImage", book.BookImage);
+                                    insertcommand.Parameters.AddWithValue("@BookImage", url[userId]);
                                     insertcommand.Parameters.AddWithValue("@UserID", userId);
                                     insertcommand.Parameters.AddWithValue("@CategoryID", book.CategoryID);
                                     insertcommand.Parameters.AddWithValue("@Rating", book.Rating);
@@ -95,7 +139,7 @@ namespace Book_Bazaar_.Controllers
                                     insertcommand.ExecuteNonQuery();
                                     conn.Close();
                                 }
-
+                                url.Remove(userId);
                                 return Ok(new { message = "Book published successfully" });
 
                             }
