@@ -186,7 +186,7 @@ namespace Book_Bazaar_.Controllers
                                 AuthorName = (string)reader["AuthorName"],
                                 Price = (decimal)reader["Price"],
                                 Quantity = (int)reader["Quantity"],
-                                ISBN = (int)reader["ISBN"],
+                                ISBN = (string)reader["ISBN"],
                                 BookImage = (string)reader["BookImage"],
                                 UserID = (Guid)reader["UserID"],
                                 CategoryID = (Guid)reader["CategoryID"],
