@@ -1,3 +1,5 @@
+using Book_Bazaar_.Models.AWS;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +16,7 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IStorageService, StorageService>();
 
 var app = builder.Build();
 

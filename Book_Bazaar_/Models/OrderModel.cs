@@ -4,7 +4,7 @@ namespace Book_Bazaar_.Models
 {
     public class OrderModel
     {
-        public int UserID { get; set; }
+        public Guid UserID { get; set; }
         public decimal OrderTotal { get; set; }
         public string Address { get; set; }
         public string City { get; set; }

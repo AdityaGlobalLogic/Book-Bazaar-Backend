@@ -18,7 +18,7 @@ namespace Book_Bazaar_.Controllers
 
         [HttpPost]
         [Route("api/orders/{userId}")]
-        public async Task<ActionResult> GenerateOrder(int userId, [FromBody] OrderModel item)
+        public async Task<ActionResult> GenerateOrder(Guid userId, [FromBody] OrderModel item)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
@@ -39,7 +39,7 @@ namespace Book_Bazaar_.Controllers
                             insertCommand.Parameters.AddWithValue("@City", item.City);
                             insertCommand.Parameters.AddWithValue("@State", item.State);
                             insertCommand.Parameters.AddWithValue("@Pincode", item.Pincode);
-                            int orderId = Convert.ToInt32(await insertCommand.ExecuteScalarAsync());
+                            Guid orderId = (Guid) insertCommand.ExecuteScalar();
 
                             List<CartTable> books = new List<CartTable>();
 
@@ -53,7 +53,7 @@ namespace Book_Bazaar_.Controllers
                                     {
                                         CartTable book = new CartTable
                                         {
-                                            BookID = (int)reader["BookID"],
+                                            BookID = (Guid)reader["BookID"],
                                             Quantity = (int)reader["Quantity"]
                                             /*Rating = (decimal)reader["Rating"],*/
                                         };

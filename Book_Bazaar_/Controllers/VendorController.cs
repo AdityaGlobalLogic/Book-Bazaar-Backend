@@ -1,4 +1,8 @@
-﻿using Book_Bazaar_.Models.Tables;
+﻿
+using Book_Bazaar_.Models;
+using Book_Bazaar_.Models.AWS;
+using Book_Bazaar_.Models.Tables;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,13 +16,54 @@ namespace Book_Bazaar_.Controllers
     public class VendorController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public VendorController(IConfiguration configuration)
+        private readonly IStorageService _storageService;
+        public static IDictionary<Guid, string> url = new Dictionary<Guid, string>();
+
+        public VendorController(IConfiguration configuration, IStorageService storageService)
         {
             _configuration = configuration;
+            _storageService = storageService;
         }
+
+        [HttpPost(Name = "UploadFile")]
+        public async Task<IActionResult> UploadFile(IFormFile file, Guid userId)
+        {
+            //Process the file
+            await using var memoryStr = new MemoryStream();
+            await file.CopyToAsync(memoryStr);
+
+            var fileExt = Path.GetExtension(file.FileName);
+            var objName = $"{Guid.NewGuid()}.{fileExt}";
+
+            var s3Obj = new S3Object()
+            {
+                BucketName = "bookbazaar",
+                InputStream = memoryStr,
+                Name = objName
+            };
+
+            var cred = new AwsCredentials()
+            {
+                AwsKey = _configuration["AwsConfiguration:AWSAccessKey"],
+                AwsSecretKey = _configuration["AwsConfiguration:AWSSecretKey"]
+            };
+
+            var result = await _storageService.UploadFileAsync(s3Obj, cred);
+
+            //get url request
+            var Imageurl = $"https://bookbazaar.s3.amazonaws.com/{objName}";
+            url.Add(userId, Imageurl);
+
+            return Ok(new 
+            { 
+                result,
+                url
+            });
+        }
+
         [HttpPost]
         [Route("api/users/{userId}/convert-to-vendor")]
-        public async Task<ActionResult> ConvertToVendor(int userId)
+        public async Task<ActionResult> ConvertToVendor(Guid userId)
         {
             // Connect to the database
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -48,13 +93,16 @@ namespace Book_Bazaar_.Controllers
                 // Execute the update command
                 updateCommand.ExecuteNonQuery();
 
-                return Ok();
+                return Ok(new
+                {
+                    message = "User is now Vendor"
+                });
             }
         }
 
         [HttpPost]
         [Route("api/users/{userId}/publish-book")]
-        public async Task<ActionResult> PublishBook(int userId,[FromBody] Books book)
+        public async Task<ActionResult> PublishBook(Guid userId,[FromBody] Books book)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
@@ -82,7 +130,7 @@ namespace Book_Bazaar_.Controllers
                                     insertcommand.Parameters.AddWithValue("@Price", book.Price);
                                     insertcommand.Parameters.AddWithValue("@Quantity", book.Quantity);
                                     insertcommand.Parameters.AddWithValue("@ISBN", book.ISBN);
-                                    insertcommand.Parameters.AddWithValue("@BookImage", book.BookImage);
+                                    insertcommand.Parameters.AddWithValue("@BookImage", url[userId]);
                                     insertcommand.Parameters.AddWithValue("@UserID", userId);
                                     insertcommand.Parameters.AddWithValue("@CategoryID", book.CategoryID);
                                     insertcommand.Parameters.AddWithValue("@Rating", book.Rating);
@@ -91,7 +139,7 @@ namespace Book_Bazaar_.Controllers
                                     insertcommand.ExecuteNonQuery();
                                     conn.Close();
                                 }
-
+                                url.Remove(userId);
                                 return Ok(new { message = "Book published successfully" });
 
                             }
