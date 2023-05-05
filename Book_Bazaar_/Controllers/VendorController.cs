@@ -163,5 +163,26 @@ namespace Book_Bazaar_.Controllers
             
         }
 
+        [HttpPost]
+        [Route("api/users/{userId}/{bookId}/delete-book")]
+        public async Task<ActionResult> DeleteBook(Guid bookId)
+        {
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                conn.Open();
+                using (SqlCommand deleteCommand = new SqlCommand("delete from Books WHERE BookID = @BookID", conn))
+                {
+
+                    deleteCommand.Parameters.AddWithValue("@BookID", bookId);
+                    deleteCommand.ExecuteNonQuery();
+                }
+                conn.Close();
+                return Ok(new
+                {
+                    message = "Book removed from inventory."
+                });
+            }
+        }
+
     }
 }
