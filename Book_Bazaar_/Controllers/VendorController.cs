@@ -102,7 +102,7 @@ namespace Book_Bazaar_.Controllers
 
         [HttpPost]
         [Route("api/users/{userId}/publish-book")]
-        public async Task<ActionResult> PublishBook(Guid userId,[FromBody] Books book)
+        public async Task<ActionResult> PublishBook(Guid userId,[FromBody] BookModel book)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
             {
