@@ -61,7 +61,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/books/{CategoryID}")]
+        [Route("api/book/{CategoryID}")]
         public async Task<ActionResult> FilterBooksByCategory(Guid CategoryID)
         {
             List<Books> books = new List<Books>();
