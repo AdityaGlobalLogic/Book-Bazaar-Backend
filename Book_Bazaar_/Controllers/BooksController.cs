@@ -61,7 +61,89 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/book/{CategoryID}")]
+        [Route("api/book/{BookID}")]
+        public async Task<ActionResult> FilterBookById(Guid BookID)
+        {
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand("SELECT * FROM Books where BookID = @BookID", connection))
+                {
+                    command.Parameters.AddWithValue("@BookID", BookID);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Books book = new Books
+                            {
+                                BookID = (Guid)reader["BookID"],
+                                Title = (string)reader["Title"],
+                                Description = (string)reader["Description"],
+                                AuthorName = (string)reader["AuthorName"],
+                                Price = (decimal)reader["Price"],
+                                Quantity = (int)reader["Quantity"],
+                                ISBN = (string)reader["ISBN"],
+                                BookImage = (string)reader["BookImage"],
+                                UserID = (Guid)reader["UserID"],
+                                CategoryID = (Guid)reader["CategoryID"],
+                                Rating = (decimal)reader["Rating"],
+                            };
+                            connection.Close();
+                            return Ok(book);
+                        }
+                        else
+                        {
+                            return BadRequest("Book not found");
+                        }
+                    }
+                }
+            }
+        }
+
+        [HttpGet]
+        [Route("api/books/trending-books")]
+        public async Task<ActionResult> GetTrendingBooks()
+        {
+            List<Books> books = new List<Books>();
+
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                connection.Open();
+
+                // Retrieve list of books from database
+                using (SqlCommand command = new SqlCommand("SELECT * FROM Books where Rating >=4.0", connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Books book = new Books
+                            {
+                                BookID = (Guid)reader["BookID"],
+                                Title = (string)reader["Title"],
+                                Description = (string)reader["Description"],
+                                AuthorName = (string)reader["AuthorName"],
+                                Price = (decimal)reader["Price"],
+                                Quantity = (int)reader["Quantity"],
+                                ISBN = (string)reader["ISBN"],
+                                BookImage = (string)reader["BookImage"],
+                                UserID = (Guid)reader["UserID"],
+                                CategoryID = (Guid)reader["CategoryID"],
+                                Rating = (decimal)reader["Rating"],
+                            };
+
+                            books.Add(book);
+                        }
+                    }
+                }
+                connection.Close();
+            }
+
+            return Ok(books);
+        }
+
+        [HttpGet]
+        [Route("api/book/category/{CategoryID}")]
         public async Task<ActionResult> FilterBooksByCategory(Guid CategoryID)
         {
             List<Books> books = new List<Books>();
