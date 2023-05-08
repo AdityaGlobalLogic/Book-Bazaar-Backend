@@ -17,7 +17,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/users")]
+        [Route("api/[controller]/users")]
         public async Task<ActionResult> GetUsers()
         {
             List<Users> users = new List<Users>();
@@ -53,7 +53,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/users/{userId}/delete-user")]
+        [Route("api/[controller]/users/{userId}/delete-user")]
         public async Task<ActionResult> DeleteUser(Guid userId)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -73,6 +73,41 @@ namespace Book_Bazaar_.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("api/[controller]/users/delete-all")]
+
+        public async Task<ActionResult> DeleteAll()
+        {
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                conn.Open();
+                using (SqlCommand deleteCommand = new SqlCommand("delete from Users", conn))
+                {
+
+                    deleteCommand.ExecuteNonQuery();
+                }
+                conn.Close();
+                return NoContent();
+            }
+        }
+        [HttpDelete]
+        [Route("api/[controller]/users/delete-mulitple/")]
+        
+        public async Task<ActionResult> DeleteMultipleUser([FromBody] List<Guid> ids)
+        {
+            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                conn.Open();
+                using (SqlCommand deleteCommand = new SqlCommand($"DELETE FROM Users WHERE UserID IN ({string.Join(",", ids.Select(id => $"'{id}'"))})", conn))
+                {
+
+                    deleteCommand.ExecuteNonQuery();
+                }
+                conn.Close();
+                return NoContent();
+            }
+
+        }
 
     }
 }
