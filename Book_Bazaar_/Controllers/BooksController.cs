@@ -182,46 +182,6 @@ namespace Book_Bazaar_.Controllers
             }
             return Ok(books);
         }
-
-        [HttpGet]
-        [Route("api/book/{BookID}")]
-        public async Task<ActionResult> FilterBookById(Guid BookID)
-        {
-            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
-            {
-                connection.Open();
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Books where BookID = @BookID", connection))
-                {
-                    command.Parameters.AddWithValue("@BookID", BookID);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if(reader.Read())
-                        {
-                            Books book = new Books
-                            {
-                                BookID = (Guid)reader["BookID"],
-                                Title = (string)reader["Title"],
-                                Description = (string)reader["Description"],
-                                AuthorName = (string)reader["AuthorName"],
-                                Price = (decimal)reader["Price"],
-                                Quantity = (int)reader["Quantity"],
-                                ISBN = (string)reader["ISBN"],
-                                BookImage = (string)reader["BookImage"],
-                                UserID = (Guid)reader["UserID"],
-                                CategoryID = (Guid)reader["CategoryID"],
-                                Rating = (decimal)reader["Rating"],
-                            };
-                            connection.Close();
-                            return Ok(book);
-                        }
-                        else
-                        {
-                            return BadRequest("Book not found");
-                        }                     
-                    }                  
-                }
-            }
-        }
     }
 }
 
