@@ -18,7 +18,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/cart/add")]
+        [Route("AddToCart")]
         public async Task<ActionResult> AddToCart(Cart item)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -72,7 +72,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/cart/remove")]
+        [Route("RemoveFromCart")]
         public async Task<ActionResult> RemoveFromCart(Cart item)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -108,7 +108,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPut]
-        [Route("api/cart/decrease")]
+        [Route("DecreaseFromCart")]
         public async Task<ActionResult> DecreaseFromCart(Cart item)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -162,7 +162,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/cart/{userId}")]
+        [Route("{userId}/GetCart")]
         public async Task<ActionResult> GetCart(Guid userId)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))

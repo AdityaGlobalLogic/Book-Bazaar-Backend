@@ -17,7 +17,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/orders/{userId}")]
+        [Route("{userId}/GenerateOrder")]
         public async Task<ActionResult> GenerateOrder(Guid userId, [FromBody] OrderModel item)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))

@@ -17,7 +17,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/[controller]/users")]
+        [Route("GetUsers")]
         public async Task<ActionResult> GetUsers()
         {
             List<Users> users = new List<Users>();
@@ -53,7 +53,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/[controller]/users/{userId}/delete-user")]
+        [Route("{userId}/DeleteUser")]
         public async Task<ActionResult> DeleteUser(Guid userId)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -74,7 +74,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpDelete]
-        [Route("api/[controller]/users/delete-all")]
+        [Route("DeleteAll")]
 
         public async Task<ActionResult> DeleteAll()
         {
@@ -91,7 +91,7 @@ namespace Book_Bazaar_.Controllers
             }
         }
         [HttpDelete]
-        [Route("api/[controller]/users/delete-mulitple/")]
+        [Route("DeleteMultipleUser")]
         
         public async Task<ActionResult> DeleteMultipleUser([FromBody] List<Guid> ids)
         {

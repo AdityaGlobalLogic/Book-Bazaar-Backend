@@ -19,7 +19,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/books")]
+        [Route("GetBooks")]
         public async Task<ActionResult> GetBooks()
         {
             List<Books> books = new List<Books>();
@@ -61,7 +61,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/book/{BookID}")]
+        [Route("{BookID}/FilterBookById")]
         public async Task<ActionResult> FilterBookById(Guid BookID)
         {
             using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -101,7 +101,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/books/trending-books")]
+        [Route("GetTrendingBooks")]
         public async Task<ActionResult> GetTrendingBooks()
         {
             List<Books> books = new List<Books>();
@@ -143,7 +143,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpGet]
-        [Route("api/book/category/{CategoryID}")]
+        [Route("{CategoryID}/FilterBooksByCategory")]
         public async Task<ActionResult> FilterBooksByCategory(Guid CategoryID)
         {
             List<Books> books = new List<Books>();
