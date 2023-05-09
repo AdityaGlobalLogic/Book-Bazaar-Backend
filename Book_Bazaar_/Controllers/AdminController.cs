@@ -52,6 +52,41 @@ namespace Book_Bazaar_.Controllers
             return Ok(users);
         }
 
+        [HttpGet]
+        [Route("{userId}/GetUserById")]
+        public async Task<ActionResult> GetUserById(Guid userId)
+        {
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand("SELECT * FROM Users where UserID = @UserID", connection))
+                {
+                    command.Parameters.AddWithValue("@UserID", userId);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Users u1 = new Users
+                            {
+                                UserID = (Guid)reader["UserID"],
+                                Email = (string)reader["Email"],
+                                IsVendor = (bool)reader["IsVendor"],
+                                FirstName = (string)reader["FirstName"],
+                                LastName = (string)reader["LastName"]
+                            };
+                            connection.Close();
+                            return Ok(u1);
+                        }
+                        else
+                        {
+                            return BadRequest("User not found");
+                        }
+                    }
+                }
+            }
+        }
+
+
         [HttpPost]
         [Route("{userId}/DeleteUser")]
         public async Task<ActionResult> DeleteUser(Guid userId)
