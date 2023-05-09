@@ -19,7 +19,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/signup")]
+        [Route("SignUp")]
         public async Task<ActionResult> SignUp(RegisterModel user)
         {
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
@@ -54,7 +54,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/login")]
+        [Route("Login")]
         public async Task<IActionResult> Login(LoginModel loginModel)
         {
             
@@ -83,6 +83,7 @@ namespace Book_Bazaar_.Controllers
                                     FirstName = (string)reader["FirstName"],
                                     LastName = (string)reader["LastName"]
                                 };
+                                connection.Close();
                                 return Ok(new
                                 {
                                     message = "Logged In Successfull",
@@ -92,14 +93,16 @@ namespace Book_Bazaar_.Controllers
                             }
                             else
                             {
+                                connection.Close();
                                 return BadRequest("Invalid Email or Password");
 
                             }
 
                         }
+                        connection.Close();
                         return BadRequest("Invalid Email or Password");
                     }
-                    connection.Close();
+                    
                 }
             }
         }

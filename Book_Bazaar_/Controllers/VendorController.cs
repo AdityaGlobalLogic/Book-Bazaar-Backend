@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Book_Bazaar_.Controllers
 {
@@ -26,7 +27,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/uploadfile")]
+        [Route("UploadFile")]
         public async Task<IActionResult> UploadFile(IFormFile file, Guid userId)
         {
             //Process the file
@@ -63,7 +64,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/users/{userId}/convert-to-vendor")]
+        [Route("{userId}/ConvertToVendor")]
         public async Task<ActionResult> ConvertToVendor(Guid userId)
         {
             // Connect to the database
@@ -101,8 +102,47 @@ namespace Book_Bazaar_.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{userId}/GetVendor_Published_Books")]
+        public async Task<ActionResult> GetVendor_Published_Books(Guid userId)
+        {
+            List<Books> books = new List<Books>();
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
+            {
+                
+                connection.Open();
+                using (SqlCommand command = new SqlCommand("SELECT * FROM Books where UserID = @UserID", connection))
+                {
+                    command.Parameters.AddWithValue("@UserID",userId);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Books book = new Books
+                            {
+                                BookID = (Guid)reader["BookID"],
+                                Title = (string)reader["Title"],
+                                Description = (string)reader["Description"],
+                                AuthorName = (string)reader["AuthorName"],
+                                Price = (decimal)reader["Price"],
+                                Quantity = (int)reader["Quantity"],
+                                ISBN = (string)reader["ISBN"],
+                                BookImage = (string)reader["BookImage"],
+                                UserID = (Guid)reader["UserID"],
+                                CategoryID = (Guid)reader["CategoryID"],
+                                Rating = (decimal)reader["Rating"],
+                            };
+                            books.Add(book);   
+                        }
+                    }
+                }
+                connection.Close();
+            }
+            return Ok(books);
+        }
+
         [HttpPost]
-        [Route("api/users/{userId}/publish-book")]
+        [Route("{userId}/PublishBook")]
         public async Task<ActionResult> PublishBook(Guid userId,[FromBody] BookModel book)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -165,7 +205,7 @@ namespace Book_Bazaar_.Controllers
         }
 
         [HttpPost]
-        [Route("api/users/{userId}/{bookId}/delete-book")]
+        [Route("{userId}/{bookId}/delete-book")]
         public async Task<ActionResult> DeleteBook(Guid bookId)
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
@@ -183,45 +223,6 @@ namespace Book_Bazaar_.Controllers
                     message = "Book removed from inventory."
                 });
             }
-        }
-
-        [HttpGet]
-        [Route("{userId}/GetVendor_Published_Books")]
-        public async Task<ActionResult> GetVendor_Published_Books(Guid userId)
-        {
-            List<Books> books = new List<Books>();
-            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyCon").ToString()))
-            {
-
-                connection.Open();
-                using (SqlCommand command = new SqlCommand("SELECT * FROM Books where UserID = @UserID", connection))
-                {
-                    command.Parameters.AddWithValue("@UserID", userId);
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            Books book = new Books
-                            {
-                                BookID = (Guid)reader["BookID"],
-                                Title = (string)reader["Title"],
-                                Description = (string)reader["Description"],
-                                AuthorName = (string)reader["AuthorName"],
-                                Price = (decimal)reader["Price"],
-                                Quantity = (int)reader["Quantity"],
-                                ISBN = (string)reader["ISBN"],
-                                BookImage = (string)reader["BookImage"],
-                                UserID = (Guid)reader["UserID"],
-                                CategoryID = (Guid)reader["CategoryID"],
-                                Rating = (decimal)reader["Rating"],
-                            };
-                            books.Add(book);
-                        }
-                    }
-                }
-                connection.Close();
-            }
-            return Ok(books);
         }
 
     }
